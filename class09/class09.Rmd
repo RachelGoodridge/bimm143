@@ -1,0 +1,135 @@
+---
+title: "class09"
+author: "Rachel Goodridge"
+date: "February 7, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Hands-on section worksheet for PCA 
+
+### Section 1: Exploratory data analysis
+
+Preparing the data
+
+```{r}
+#Download data
+wisc.df <- read.csv("WisconsinCancer.csv")
+#Convert data to a matrix
+wisc.data <- as.matrix(wisc.df[,3:32])
+row.names(wisc.data) <- wisc.df$id
+#Preview data
+head(wisc.df)
+#How many malignant (M) and benign (B)?
+table(wisc.df$diagnosis)
+#Change M to 1 and B to 0
+diagnosis <- as.numeric(wisc.df$diagnosis=="M")
+```
+
+Exploratory data analysis
+
+```{r}
+#Q1: How many observations are in this dataset?
+nrow(wisc.data)
+#Q2: How many variables/features in the data are suffixed with _mean?
+length(grep("_mean",colnames(wisc.data)))
+#Q3: How many of the observations have a malignant diagnosis?
+sum(diagnosis)
+```
+
+### Section 2: Principal Component Analysis
+
+Performing PCA
+
+```{r}
+#Check the column means
+colMeans(wisc.data)
+#Perform PCA
+wisc.pr <- prcomp(wisc.data,scale=TRUE)
+summary(wisc.pr)
+#Q4: From your results, what proportion of the original variance is captured by the first principal components (PC1)?
+0.4427
+#Q5: How many principal components (PCs) are required to describe at least 70% of the original variance in the data?
+3
+#Q6: How many principal components (PCs) are required to describe at least 90% of the original variance in the data?
+7
+```
+
+Interpreting PCA results
+
+```{r}
+#Create a biplot
+biplot(wisc.pr)
+#Create a scatter plot of PC1 vs PC2
+plot(wisc.pr$x[,1],wisc.pr$x[,2],col=(diagnosis+1),xlab="PC1",ylab="PC2")
+#Create a scatter plot of PC1 vs PC3
+plot(wisc.pr$x[,1],wisc.pr$x[,3],col=(diagnosis+1),xlab="PC1",ylab="PC3")
+```
+
+Variance explained
+
+```{r}
+#Calculate variance
+pr.var <- wisc.pr$sdev^2
+#Proportion of Variance
+pve <- round((pr.var/sum(pr.var))*100,1)
+#Plot variance
+plot(pve,xlab = "Principal Component",ylab = "Proportion of Variance Explained",type = "o")
+#Make a scree plot
+barplot(pve,ylab = "Precent of Variance Explained",names.arg=paste0("PC",1:length(pve)),las=2,axes = FALSE)
+axis(2,at=pve,labels=round(pve,2))
+```
+
+### Section 3: Hierarchical clustering
+
+Hierarchical clustering of case data
+
+```{r}
+#Scale the data
+data.scaled <- scale(wisc.data)
+round(apply(data.scaled,2,sd),1)
+#Calculate the Euclidean distance
+data.dist <- dist(data.scaled)
+#Create a hierarchical clustering model
+wisc.hclust <- hclust(data.dist,method="complete")
+```
+
+Results of hierarchical clustering
+
+```{r}
+#Plot a cluster dendrogram
+plot(wisc.hclust)
+```
+
+### Section 5: Combining methods
+
+Clustering on PCA results
+
+```{r}
+#Create and plot a cluster dendrogram
+pc.hclust <- hclust(dist(wisc.pr$x[,1:2]),method="ward.D2")
+plot(pc.hclust)
+#Break the tree into clusters
+groups3 <- (cutree(pc.hclust,k=3))
+table(groups3,diagnosis)
+#Plot the clusters
+plot(groups3,col=diagnosis+1)
+#Plot PC1 vs PC2 vs PC3 in 3D
+library(rgl)
+plot3d(wisc.pr$x[,1:3], xlab="PC 1", ylab="PC 2", zlab="PC 3", cex=1.5, size=1, type="s", col=diagnosis+1)
+```
+
+### Section 7: Prediction
+
+```{r}
+#Download new data
+new <- read.csv("https://tinyurl.com/new-samples-CSV")
+#Predict how the new data will fit into the existing PCA model
+npc <- predict(wisc.pr, newdata=new)
+#Plot the prediction over the PCA model
+plot(wisc.pr$x[,1:2], col=diagnosis+1)
+points(npc[,1], npc[,2], col="blue", pch=15, cex=3)
+```

@@ -1,0 +1,175 @@
+---
+title: "Class 6"
+author: "Rachel Goodridge"
+date: "January 24, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Section 1: Reading files again :-)
+
+Here we are going to try using the **read.table()** function and friends to read some example flat files.
+
+First lets try adding a simple plot
+
+```{r}
+plot(1:10)
+```
+
+Back to file reading...
+
+```{r}
+read.table("https://bioboot.github.io/bimm143_W19/class-material/test1.txt",header=TRUE,sep=",")
+```
+
+For this common CSV format we can use **read.csv()**
+
+```{r}
+file1 <- "https://bioboot.github.io/bimm143_W19/class-material/test1.txt"
+data1 <- read.csv(file1)
+data1
+```
+```{r}
+file2 <- "https://bioboot.github.io/bimm143_W19/class-material/test2.txt"
+data2 <- read.table(file2,header=TRUE,sep="$")
+data2
+```
+```{r}
+file3 <- "https://bioboot.github.io/bimm143_W19/class-material/test3.txt"
+data3 <- read.table(file3)
+data3
+```
+
+### Section 2: R Functions
+
+
+My first silly function
+
+```{r}
+add <- function(x, y=1) {
+ # Sum the input x and y
+ x + y
+}
+```
+
+Lets try using this function
+
+```{r}
+add(1)
+```
+
+```{r}
+add(1,100)
+```
+
+```{r}
+add( c(1, 2, 3) )
+```
+
+```{r}
+add(c(1, 2, 3),4)
+```
+
+```{r}
+#add(1, 2, 2)
+```
+
+```{r}
+#add(x=1, y=“b”)
+```
+
+When you find yourself doing the same thing three or more times, make a function instead.
+
+Instead of this:
+```{r}
+#df$a <- (df$a - min(df$a)) / (max(df$a) - min(df$a))
+#df$b <- (df$b - min(df$a)) / (max(df$b) - min(df$b))
+#df$c <- (df$c - min(df$c)) / (max(df$c) - min(df$c))
+#df$d <- (df$d - min(df$d)) / (max(df$a) - min(df$d))
+```
+
+Make a function:
+```{r}
+rescale <- function(x) {
+  rng <- range(x)
+  (x-rng[1])/(rng[2]-rng[1])
+}
+```
+
+Test on a small example where we know what the answer should be!
+```{r}
+rescale(1:10)
+```
+```{r}
+#How would you get this function to run?
+#rescale(c(1,2,NA,3,10))
+```
+```{r}
+#What should your function do here?
+#rescale(c(1,10,"string"))
+```
+
+Lets make a new version of the function to get rid of the NA error.
+```{r}
+rescale2 <- function(x,na.rm=TRUE) {
+  rng <- range(x,na.rm=na.rm)
+  (x-rng[1])/(rng[2]-rng[1])
+}
+```
+```{r}
+rescale2(c(1,2,NA,3,10))
+```
+
+Version 3 of the same rescale function with plot
+```{r}
+rescale3 <- function(x, na.rm=TRUE, plot=FALSE) {
+ rng <-range(x, na.rm=na.rm)
+ print("Hello")
+ answer <- (x - rng[1]) / (rng[2] - rng[1])
+ print("is it me you are looking for?")
+ if(plot) {
+ plot(answer, typ="b", lwd=4)
+ }
+ print("I can see it in ...")
+ return(answer)
+}
+```
+```{r}
+rescale3(c(1:6,NA,10),plot=TRUE)
+```
+
+### Working with the bio3d package
+
+To install this package I used the command **install.packages("bio3d")**
+
+Lets get using it.
+
+```{r}
+library(bio3d)
+```
+
+```{r}
+# Read a PDB file from the database
+s1 <- read.pdb("4AKE") # kinase with drug
+s1
+```
+
+Try out the provided code...
+```{r}
+s1 <- read.pdb("4AKE") # kinase with drug
+s2 <- read.pdb("1AKE") # kinase no drug
+s3 <- read.pdb("1E4Y") # kinase with drug
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s3, chain="A", elety="CA")
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+

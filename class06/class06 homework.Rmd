@@ -1,0 +1,60 @@
+---
+title: "Class 06 Homework"
+author: "Rachel Goodridge"
+date: "January 27, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Lecture 6 Hands-on Lab Sheet
+
+Section 1: Improving Analysis Code by Writing Functions
+
+Part B: Install the bio3d package using the command **install.packages("bio3d")**
+```{r}
+library(bio3d)
+```
+
+### The Original Code
+
+Any copy/paste errors have been corrected. 
+```{r}
+s1 <- read.pdb("4AKE") # kinase with drug
+s2 <- read.pdb("1AKE") # kinase no drug
+s3 <- read.pdb("1E4Y") # kinase with drug
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s3, chain="A", elety="CA")
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+
+### My Code
+
+Question 6
+
+Create a function to simplify and avoid errors.
+```{r}
+PDB_plot <- function(x) {
+  chain <- trim.pdb(read.pdb(x), chain="A", elety="CA")
+  plotb3(chain$atom$b, sse=chain, typ="l", ylab="Bfactor")
+}
+```
+The input (x) will be the protein (in this case: "4AKE", "1AKE", or "1E4Y"). The function will read the protein PDB data and use this to create a plot for that protein. To call the function, type **PDB_plot(x)**.
+
+Test to ensure the function works correctly.
+```{r}
+PDB_plot("4AKE")
+PDB_plot("1AKE")
+PDB_plot("1E4Y")
+```
+
+The plots created using this function match the plots created by the original code. Thus, the function has done it's job!
+
