@@ -2,7 +2,7 @@
 #' title: "BIMM 143 Class 5"
 #' author: "Rachel Goodridge"
 #' date: "January 22, 2019"
-#' output: html_document
+#' output: github_document
 #' ---
 
 # Class 05 R graphics intro
