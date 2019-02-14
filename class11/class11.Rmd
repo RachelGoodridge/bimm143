@@ -1,0 +1,26 @@
+---
+title: "Class 11"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Structural Bioinformatics
+
+## Section 1: Introduction to the RCSB Protein Data Bank (PDB)
+
+### PDB statistics
+
+Q1: Determine the percentage of structures solved by X-Ray and Electron Microscopy. From
+the website what proportion of structures are protein?
+
+```{r}
+stats <- read.csv("PDB Data.csv")
+stats
+(stats$Total/sum(stats$Total))*100
+sum(stats$Proteins)/sum(stats$Total)
+```
+
+## Section 2: Visualizing the HIV-1 protease structure
