@@ -23,4 +23,54 @@ stats
 sum(stats$Proteins)/sum(stats$Total)
 ```
 
-## Section 2: Visualizing the HIV-1 protease structure
+## Section 3: Introduction to Bio3D in R
+
+### Getting started with Bio3D
+
+First we have to load the package we want to use
+
+```{r}
+library(bio3d)
+```
+
+Now we can use the functions from this bio3d package
+
+### Working with individual PDB files
+
+```{r}
+pdb <- read.pdb("1hsg")
+pdb
+```
+
+### Atom selection
+
+```{r}
+# Select all C-alpha atoms (return their indices)
+ca.inds <- atom.select(pdb,"calpha")
+ca.inds
+# Print details of the first few selected atoms
+head(pdb$atom[ca.inds$atom,])
+# Select chain A
+a.inds <- atom.select(pdb,chain="A")
+# Select C-alphas of chain A
+ca.inds <- atom.select(pdb,"calpha",chain="A")
+# We can combine multiple selection criteria to return their intersection
+cab.inds <- atom.select(pdb,elety=c("CA","CB"),chain="A",resno=10:20)
+```
+
+We want to select out the protein and drug only parts of these molecular PDB files. 
+
+```{r}
+prot.inds <- atom.select(pdb,"protein")
+pdb$atom[prot.inds$atom,]
+prot.pdb <- trim.pdb(pdb,prot.inds)
+write.pdb(prot.pdb,file="protein.pdb")
+```
+
+Lets do the same thing for our drug
+
+```{r}
+ligs.inds <- atom.select(pdb, "ligand")
+lig.pdb <- trim.pdb(pdb,ligs.inds)
+write.pdb(lig.pdb,file="ligand.pdb")
+```
