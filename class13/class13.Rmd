@@ -1,0 +1,45 @@
+---
+title: "Class 13"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 1: In silico docking of drugs to HIV-1 protease
+
+### Obtaining and inspecting our input structure
+
+```{r}
+library(bio3d)
+file.name <- get.pdb("1hsg")
+hiv <- read.pdb(file.name)
+hiv
+```
+
+Q1: What is the name of the two non protein resid values in this structure? What does resid
+correspond to and how would you get a listing of all reside values in this structure?
+[HOH (127), MK1 (1)]
+198 protein atoms residues / C alpha atoms
+0 nucleic acid atoms residues / phosphate atoms
+128 non-protein / nucleic atoms residues
+
+### Prepare initial protein and ligand input files
+
+```{r}
+prot <- trim.pdb(hiv,"protein")
+lig <- trim.pdb(hiv,"ligand")
+write.pdb(prot,file="1hsg_protein.pdb")
+write.pdb(lig,file="1hsg_ligand.pdb")
+```
+
+### Using AutoDockTools to setup protein docking input
+
+Q2: Can you locate the binding site visually? Note that
+crystal structures normally lack hydrogen atoms, why? 
+Yes, I can visually locate the binding site.
+Hydrogens are too small to be seen in normal crystal structures. 
+
+Q3: Look at the charges. Does it make sense (e.g. based on your knowledge of the
+physiochemical properties of amino acids)?
