@@ -55,3 +55,13 @@ ori <- read.pdb("1hsg_ligand.pdbqt")
 rmsd(ori,res)
 ```
 
+## Normal Mode Analysis
+
+```{r}
+library(bio3d)
+pdb <- read.pdb("1HEL")
+m <- nma(pdb)
+plot(m)
+mktrj(m,mode=7,file="nma_7.pdb")
+```
+
