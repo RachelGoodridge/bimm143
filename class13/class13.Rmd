@@ -45,8 +45,13 @@ Q3: Look at the charges. Does it make sense (e.g. based on your knowledge of the
 physiochemical properties of amino acids)?
 Yes, the charges make sense.
 
-### Prepare the ligand
+## Read in autodoc results
 
-### Prepare a docking configuration file
+```{r}
+library(bio3d)
+res <- read.pdb("all.pdbqt",multi=TRUE)
+write.pdb(res,file="results.pdb")
+ori <- read.pdb("1hsg_ligand.pdbqt")
+rmsd(ori,res)
+```
 
-## Section 2: Docking ligands into HIV-1 protease

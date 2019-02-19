@@ -13,4 +13,4 @@ size_x = 30
 size_y = 30
 size_z = 30
 
-seed = 2019
+seed = 2009
