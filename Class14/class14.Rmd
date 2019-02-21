@@ -1,0 +1,70 @@
+---
+title: "Class 14"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Asthma SNPs in MXL Population
+
+Read file from Ensemble
+
+http://uswest.ensembl.org/Homo_sapiens/Variation/Sample?db=core;r=17:39894595-39895595;v=rs8067378;vdb=variation;vf=362656008#373531_tablePanel
+
+```{r}
+mxl <- read.csv("MXL.csv")
+head(mxl)
+```
+
+How many of each genotype are in this set?
+
+```{r}
+table(mxl$Genotype..forward.strand.)
+```
+
+Percent Values
+
+```{r}
+table(mxl$Genotype..forward.strand.)/nrow(mxl)*100
+```
+
+### RNA-Seq
+
+Fastq quality scores
+
+Q: Does the first sequence have good quality? 
+
+```{r}
+q <- "DDDDCDEDCDDDDBBDDDCC@"
+library(seqinr)
+library(gtools)
+asc(s2c(q))-33
+```
+
+### Population scale analysis
+
+Does the genotype for rs9067378 influence expression of the important asthma linked genes we found?
+
+```{r}
+geno <- read.table("Expression.txt")
+head(geno)
+table(geno$geno)
+```
+
+```{r}
+inds.gg <- geno$geno == "G/G"
+summary(geno$exp[inds.gg])
+inds.aa <- geno$geno == "A/A"
+summary(geno$exp[inds.aa])
+inds.ag <- geno$geno == "A/G"
+summary(geno$exp[inds.ag])
+```
+
+Some nice figure that shows the distribution of these expression values?
+
+```{r}
+boxplot(exp ~ geno,geno)
+```
+
