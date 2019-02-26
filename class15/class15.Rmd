@@ -1,0 +1,147 @@
+---
+title: "Class 15"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Import countData and colData into R
+
+```{r}
+counts <- read.csv("data/Scaled.csv",stringsAsFactors = FALSE)
+metadata <- read.csv("data/Meta.csv",stringsAsFactors = FALSE)
+head(counts)
+head(metadata)
+```
+
+Check for correspondence of metadata and countdata
+
+```{r}
+all(colnames(counts)[-1]==metadata$id)
+```
+
+### Toy differential gene expression
+
+First task find which columns in **counts** correspond to the control conditions (i.e. no drug!). Then we can calculate the mean value for each gene. 
+
+```{r}
+control.inds <- metadata$dex=="control"
+control.ids <- metadata$id[control.inds]
+head(counts[,control.ids])
+```
+
+Then calculate the mean counts per gene across these samples:
+
+```{r}
+control.mean <- rowSums(counts[,control.ids])/ncol(counts[,control.ids])
+names(control.mean) <- counts$ensgene
+head(control.mean)
+```
+
+Now do the same thing for thw drug treated samples (i.e. *treated* columns)
+
+```{r}
+treated.inds <- metadata$dex=="treated"
+treated.ids <- metadata$id[treated.inds]
+head(counts[,treated.ids])
+```
+
+Then calculate the mean counts per gene across these samples:
+
+```{r}
+treated.mean <- rowSums(counts[,treated.ids])/ncol(counts[,treated.ids])
+names(treated.mean) <- counts$ensgene
+head(treated.mean)
+```
+
+We will combine our meancount data for bookkeeping purposes.
+
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+colSums(meancounts)
+```
+
+Create a scatter plot showing the mean of the treated samples against the mean of the control samples.
+
+```{r}
+plot(meancounts$control.mean,meancounts$treated.mean,log="xy",xlab="log Control",ylab="log Treated")
+```
+
+Here we calculate log2foldchange, add it to our meancounts data.frame, and inspect the results. 
+
+```{r}
+meancounts$log2fc <- log2(meancounts[,"treated.mean"]/meancounts[,"control.mean"])
+head(meancounts)
+```
+
+Let’s filter our data to remove NaN and -Inf.
+
+```{r}
+zero.vals <- which(meancounts[,1:2]==0, arr.ind=TRUE)
+to.rm <- unique(zero.vals[,1])
+mycounts <- meancounts[-to.rm,]
+head(mycounts)
+```
+
+A common threshold used for calling something differentially expressed is a log2(FoldChange) of greater than 2 or less than -2. Let’s filter the dataset both ways to see how many genes are up or down-regulated.
+
+```{r}
+up.ind <- mycounts$log2fc > 2
+down.ind <- mycounts$log2fc < (-2)
+sum(up.ind)
+sum(down.ind)
+```
+
+There are `sum(up.ind)` up regulated genes and `sum(down.ind)` down regulated genes.
+
+```{r}
+head(mycounts[up.ind,])
+```
+
+### Adding annotation data
+
+```{r}
+anno <- read.csv("data/Annotables.csv")
+head(anno)
+```
+
+Use the **merge()** function to add annotation data from ensemble.
+
+```{r}
+mycounts.annotated <- merge(x=mycounts,y=anno,by.x="row.names",by.y="ensgene")
+head(mycounts.annotated)
+```
+
+### DESeq2 analysis
+
+Now we do this analysis properly with p-values!
+
+```{r}
+library(DESeq2)
+```
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData=counts,colData=metadata,design=~dex,tidy=TRUE)
+dds <- DESeq(dds)
+```
+
+```{r}
+res <- results(dds,alpha=0.01)
+summary(res)
+```
+
+### Data Visualization
+
+Let's make a volcano plot.
+
+```{r}
+mycols <- rep("gray",nrow(res))
+mycols[abs(res$log2FoldChange)>2] <- "red"
+mycols[(res$padj<0.01)&(abs(res$log2FoldChange)>2)] <- "blue"
+plot(res$log2FoldChange,-log(res$padj),col=mycols,ylab="-Log(P-value)",xlab="Log2(FoldChange)")
+abline(v=c(-2,2),col="gray",lty=2)
+abline(h=-log(0.1),col="gray",lty=2)
+```
+
