@@ -1,0 +1,21 @@
+---
+title: "Midterm"
+author: "Rachel Goodridge"
+date: "March 6, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(bio3d)
+```
+
+```{r}
+fasta <- read.fasta("clustal")
+matrix <- seqidentity(fasta)
+heatmap(matrix, margins=c(10,2))
+```
+
