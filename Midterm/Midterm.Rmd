@@ -24,6 +24,6 @@ blast.pdb("FVNQHLCGSHLVEALYLVCGERGFFYTPK")
 ```
 
 ```{r}
-pdb.annotate("1XDA_B")
+pdb.annotate("6INS_E")
 ```
 
