@@ -19,3 +19,11 @@ matrix <- seqidentity(fasta)
 heatmap(matrix, margins=c(10,2))
 ```
 
+```{r}
+blast.pdb("FVNQHLCGSHLVEALYLVCGERGFFYTPK")
+```
+
+```{r}
+pdb.annotate("1XDA_B")
+```
+
