@@ -85,6 +85,7 @@ both_na(x, y2)
 
 Lets write a new function to get rid of the unhelpful error and confusion
 
+code:
 both_na2 <- function(x, y) {
  if(length(x) != length(y)) {
  stop("Input x and y should be vectors of the same length")}

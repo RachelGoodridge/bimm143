@@ -122,7 +122,7 @@ both_na(x, y2)
 
 Lets write a new function to get rid of the unhelpful error and confusion
 
-both\_na2 &lt;- function(x, y) { if(length(x) != length(y)) { stop("Input x and y should be vectors of the same length")} sum( is.na(x) & is.na(y) )
+code: both\_na2 &lt;- function(x, y) { if(length(x) != length(y)) { stop("Input x and y should be vectors of the same length")} sum( is.na(x) & is.na(y) )
 
 both\_na2(x, y1) both\_na2(x, y2)
 
