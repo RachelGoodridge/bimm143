@@ -76,7 +76,6 @@ write.pdb(lig.pdb,file="ligand.pdb")
 ```
 
 ```{r}
-install.packages("devtools")
 devtools::install_bitbucket("Grantlab/bio3d-view")
 library("bio3d.view")
 pdb <- read.pdb("5p21")
